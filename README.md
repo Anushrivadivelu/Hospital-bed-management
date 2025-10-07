@@ -27,4 +27,4 @@ A comprehensive hospital bed management system built with Python Flask that prio
 
 3. **Access the System**
    ```Open your web browser and navigate to:
-   http://localhost:5000
+    https://hospital-bed-management-5ti2.onrender.com
