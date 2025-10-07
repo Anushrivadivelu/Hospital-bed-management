@@ -709,5 +709,6 @@ if __name__ == '__main__':
     print("Sample hospital created: HOSP001 (password: password123)")
     print("Access the application at: http://127.0.0.1:5000")
     
-    # Run the app
-    app.run(debug=True, host='0.0.0.0', port=5000)
+    import os
+    port = int(os.environ.get("PORT", 5000))
+    app.run(host='0.0.0.0', port=port)
