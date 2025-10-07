@@ -1,0 +1,307 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CURA - Hospital Bed Allocation</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="/static/style.css">
+</head>
+<body>
+    <!-- Login Page -->
+    <div id="loginPage" class="page active">
+        <div class="login-container">
+            <div class="login-box">
+                <div class="login-header">
+                    <h1><i class="fas fa-hospital"></i> CURA</h1>
+                    <p>Hospital Bed Allocation System</p>
+                </div>
+                
+                <div id="loginForm">
+                    <div class="form-group">
+                        <label>Hospital ID</label>
+                        <input type="text" id="hospitalId" class="form-control" placeholder="Enter Hospital ID">
+                    </div>
+                    <div class="form-group">
+                        <label>Password</label>
+                        <input type="password" id="password" class="form-control" placeholder="Enter Password">
+                    </div>
+                    <button class="btn" onclick="login()">Login</button>
+                    <div class="toggle-form">
+                        <p>Don't have an account? <a onclick="showRegister()">Register Hospital</a></p>
+                    </div>
+                </div>
+                
+                <div id="registerForm" style="display: none;">
+                    <div class="form-group">
+                        <label>Hospital ID</label>
+                        <input type="text" id="regHospitalId" class="form-control" placeholder="Enter Hospital ID (e.g., HOSP002)" required>
+                    </div>
+                    <div class="form-group">
+                        <label>Hospital Name</label>
+                        <input type="text" id="regHospitalName" class="form-control" placeholder="Enter Hospital Name" required>
+                    </div>
+                    <div class="form-group">
+                        <label>Address</label>
+                        <input type="text" id="regAddress" class="form-control" placeholder="Enter Hospital Address" required>
+                    </div>
+                    <div class="form-group">
+                        <label>Contact Number</label>
+                        <input type="text" id="regContact" class="form-control" placeholder="Enter Contact Number" required>
+                    </div>
+                    <div class="form-group">
+                        <label>Total Beds</label>
+                        <input type="number" id="regBeds" class="form-control" placeholder="Enter Total Beds" required>
+                    </div>
+                    <div class="form-group">
+                        <label>ICU Beds</label>
+                        <input type="number" id="regIcuBeds" class="form-control" placeholder="Enter ICU Beds" required>
+                    </div>
+                    <div class="form-group">
+                        <label>Password</label>
+                        <input type="password" id="regPassword" class="form-control" placeholder="Create Password" required>
+                    </div>
+                    <button class="btn btn-secondary" onclick="registerHospital()">Register Hospital</button>
+                    <div class="toggle-form">
+                        <p>Already have an account? <a onclick="showLogin()">Login</a></p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Dashboard -->
+    <div id="dashboardPage" class="page">
+        <div class="header">
+            <div class="container">
+                <div class="header-content">
+                    <div class="logo">
+                        <i class="fas fa-hospital"></i>
+                        <h1>CURA</h1>
+                    </div>
+                    <div class="user-info">
+                        <span id="hospitalNameDisplay">Hospital Name</span>
+                        <button class="logout-btn" onclick="logout()">Logout</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <div class="sidebar">
+            <ul class="sidebar-menu">
+                <li><a href="#" onclick="showPage('dashboard')" class="active">
+                    <i class="fas fa-tachometer-alt"></i> <span>Dashboard</span>
+                </a></li>
+                <li><a href="#" onclick="showPage('bedAllocation')">
+                    <i class="fas fa-procedures"></i> <span>Bed Allocation</span>
+                </a></li>
+                <li><a href="#" onclick="showPage('availableBeds')">
+                    <i class="fas fa-bed"></i> <span>Available Beds</span>
+                </a></li>
+                <li><a href="#" onclick="showPage('allocatedPatients')">
+                    <i class="fas fa-user-injured"></i> <span>Allocated Patients</span>
+                </a></li>
+            </ul>
+        </div>
+        
+        <div class="main-content">
+            <!-- Dashboard Content -->
+            <div id="dashboardContent" class="page-content active">
+                <div class="page-title">
+                    <h2>Hospital Dashboard</h2>
+                    <button class="btn btn-sm" onclick="loadDashboardData()">
+                        <i class="fas fa-sync-alt"></i> Refresh
+                    </button>
+                </div>
+                
+                <div class="stats-cards">
+                    <div class="stat-card">
+                        <h3>Total Beds</h3>
+                        <div class="value" id="totalBeds">0</div>
+                    </div>
+                    <div class="stat-card">
+                        <h3>Available Beds</h3>
+                        <div class="value" id="availableBeds">0</div>
+                    </div>
+                    <div class="stat-card icu">
+                        <h3>ICU Beds</h3>
+                        <div class="value" id="icuBeds">0</div>
+                    </div>
+                    <div class="stat-card flexible">
+                        <h3>Flexible Beds</h3>
+                        <div class="value" id="flexibleBeds">0</div>
+                    </div>
+                    <div class="stat-card occupied">
+                        <h3>Occupied Beds</h3>
+                        <div class="value" id="occupiedBeds">0</div>
+                    </div>
+                </div>
+                
+                <div class="content-section">
+                    <h3>Recent Bed Allocations</h3>
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>Patient Name</th>
+                                <th>Age</th>
+                                <th>Condition</th>
+                                <th>Severity</th>
+                                <th>Bed Type</th>
+                                <th>Admission Date</th>
+                                <th>Bed ID</th>
+                            </tr>
+                        </thead>
+                        <tbody id="recentAllocationsTable">
+                            <tr>
+                                <td colspan="7" class="empty-state">
+                                    <i class="fas fa-user-injured"></i>
+                                    <p>No recent allocations</p>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+            <!-- Bed Allocation Content -->
+            <div id="bedAllocationContent" class="page-content">
+                <div class="page-title">
+                    <h2>Bed Allocation</h2>
+                </div>
+                
+                <div class="content-section">
+                    <h3>Allocate Bed to Patient</h3>
+                    <form onsubmit="allocateBed(event)">
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label>Patient Name</label>
+                                <input type="text" id="patientName" class="form-control" placeholder="Enter Patient Name" required>
+                            </div>
+                            <div class="form-group">
+                                <label>Age</label>
+                                <input type="number" id="patientAge" class="form-control" placeholder="Enter Age" required>
+                            </div>
+                            <div class="form-group">
+                                <label>Blood Group</label>
+                                <select id="patientBlood" class="form-control" required>
+                                    <option value="">Select Blood Group</option>
+                                    <option value="A+">A+</option>
+                                    <option value="A-">A-</option>
+                                    <option value="B+">B+</option>
+                                    <option value="B-">B-</option>
+                                    <option value="O+">O+</option>
+                                    <option value="O-">O-</option>
+                                    <option value="AB+">AB+</option>
+                                    <option value="AB-">AB-</option>
+                                </select>
+                            </div>
+                        </div>
+                        
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label>Medical Condition</label>
+                                <input type="text" id="admissionCause" class="form-control" placeholder="Enter Condition" required>
+                            </div>
+                            <div class="form-group">
+                                <label>Severity Level</label>
+                                <select id="severity" class="form-control" required>
+                                    <option value="">Select Severity</option>
+                                    <option value="high">High</option>
+                                    <option value="medium">Medium</option>
+                                    <option value="low">Low</option>
+                                </select>
+                            </div>
+                            <div class="form-group">
+                                <label>Health Risk</label>
+                                <select id="healthRisk" class="form-control" required>
+                                    <option value="">Select Health Risk</option>
+                                    <option value="critical">Critical</option>
+                                    <option value="moderate">Moderate</option>
+                                    <option value="stable">Stable</option>
+                                </select>
+                            </div>
+                        </div>
+                        
+                        <div class="form-group">
+                            <label>Doctor's Recommendation</label>
+                            <select id="doctorRecommendation" class="form-control" required>
+                                <option value="">Select Bed Type</option>
+                                <option value="icu">ICU</option>
+                                <option value="general">General Ward</option>
+                                <option value="flexible">Flexible Care</option>
+                            </select>
+                        </div>
+                        
+                        <button type="submit" class="btn">Allocate Bed</button>
+                    </form>
+                </div>
+            </div>
+
+            <!-- Available Beds Content -->
+            <div id="availableBedsContent" class="page-content">
+                <div class="page-title">
+                    <h2>Available Beds</h2>
+                </div>
+                
+                <div class="content-section">
+                    <h3>All Beds</h3>
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>Bed ID</th>
+                                <th>Type</th>
+                                <th>Ward/Unit</th>
+                                <th>Status</th>
+                                <th>Last Occupied</th>
+                            </tr>
+                        </thead>
+                        <tbody id="bedsTable">
+                            <tr>
+                                <td colspan="5" class="empty-state">
+                                    <i class="fas fa-bed"></i>
+                                    <p>Loading beds...</p>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+            <!-- Allocated Patients Content -->
+            <div id="allocatedPatientsContent" class="page-content">
+                <div class="page-title">
+                    <h2>Allocated Patients</h2>
+                </div>
+                <div class="content-section">
+                    <h3>Patients Currently Admitted</h3>
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>Patient Name</th>
+                                <th>Age</th>
+                                <th>Blood Group</th>
+                                <th>Condition</th>
+                                <th>Severity</th>
+                                <th>Bed ID</th>
+                                <th>Admission Date</th>
+                                <th>Expected Discharge</th>
+                                <th>Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody id="patientsTable">
+                            <tr>
+                                <td colspan="9" class="empty-state">
+                                    <i class="fas fa-user-injured"></i>
+                                    <p>Loading patients...</p>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="/static/script.js"></script>
+</body>
+</html>
